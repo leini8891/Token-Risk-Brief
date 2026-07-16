@@ -8,11 +8,18 @@ SUBMISSION_PACKAGE.md
 # Local credentials and configuration
 .env
 .env.*
+.npmrc
+.pypirc
 *.pem
 *.key
 *.p12
 *.pfx
 *.keystore
 *.mnemonic
+*.seed
+auth.json
+wallet*
 credentials*
 secrets*
+*_api_key*
+*_secret*
