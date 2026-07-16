@@ -1,0 +1,18 @@
+.DS_Store
+
+# Private or obsolete project material
+PLAN.md
+ARCHIVED_PROOFPACK_PLAN.md
+SUBMISSION_PACKAGE.md
+
+# Local credentials and configuration
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.mnemonic
+credentials*
+secrets*

@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Token Risk Brief — 57s Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #030711;
+      --panel: rgba(12, 23, 42, 0.88);
+      --panel-strong: #0b172a;
+      --line: rgba(106, 200, 255, 0.2);
+      --cyan: #37d5ff;
+      --blue: #4388ff;
+      --amber: #ffb84d;
+      --green: #49d49d;
+      --text: #f6f9ff;
+      --muted: #9db0ca;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    #stage {
+      position: relative;
+      width: min(100vw, 177.7778vh);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 74% 42%, rgba(22, 130, 255, 0.24), transparent 33%),
+        linear-gradient(130deg, #02050c 0%, #061326 55%, #020611 100%);
+    }
+
+    #stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.32;
+      background-image:
+        linear-gradient(rgba(65, 143, 210, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(65, 143, 210, 0.08) 1px, transparent 1px);
+      background-size: 54px 54px;
+      transform: perspective(700px) rotateX(56deg) scale(1.4) translateY(26%);
+      transform-origin: bottom;
+    }
+
+    .scene {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      align-items: center;
+      padding: 5.5%;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(1.025);
+      transition: opacity 700ms ease, transform 900ms ease;
+      z-index: 2;
+    }
+
+    .scene.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1);
+    }
+
+    .scene.leaving {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+
+    .eyebrow {
+      margin-bottom: 1.2rem;
+      color: var(--cyan);
+      font-size: clamp(14px, 1.3vw, 24px);
+      font-weight: 750;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 920px;
+      margin-bottom: 1.1rem;
+      font-size: clamp(46px, 6.2vw, 110px);
+      line-height: 0.96;
+      letter-spacing: -0.05em;
+    }
+
+    h2 {
+      margin-bottom: 1rem;
+      font-size: clamp(34px, 4vw, 72px);
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      max-width: 920px;
+      color: var(--muted);
+      font-size: clamp(20px, 2.1vw, 37px);
+      line-height: 1.42;
+    }
+
+    .caption {
+      position: absolute;
+      right: 5.5%;
+      bottom: 4.2%;
+      left: 5.5%;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      background: rgba(0, 5, 14, 0.78);
+      box-shadow: 0 14px 36px rgba(0,0,0,0.2);
+      color: #e5edf9;
+      font-size: clamp(14px, 1.4vw, 25px);
+      line-height: 1.35;
+      text-align: center;
+      backdrop-filter: blur(14px);
+    }
+
+    .cover {
+      padding: 0;
+      background: #02050d url("../assets/token-risk-brief-cover-1280x720.png") center / cover no-repeat;
+    }
+
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 54%, rgba(0,4,12,0.9) 100%);
+    }
+
+    .cover .caption { z-index: 2; }
+
+    .input-layout {
+      display: grid;
+      grid-template-columns: 0.95fr 1.25fr;
+      gap: 5%;
+      align-items: center;
+    }
+
+    .app-card {
+      position: relative;
+      padding: 4.5%;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(160deg, rgba(13, 29, 52, 0.96), rgba(4, 12, 25, 0.96));
+      box-shadow: 0 28px 90px rgba(0, 33, 92, 0.46), inset 0 0 0 1px rgba(255,255,255,0.025);
+    }
+
+    .app-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(110deg, rgba(55,213,255,0.22), transparent 35%, rgba(67,136,255,0.2));
+      z-index: -1;
+      filter: blur(14px);
+    }
+
+    .label {
+      margin-bottom: 0.7rem;
+      color: var(--muted);
+      font-size: clamp(14px, 1.15vw, 21px);
+      font-weight: 650;
+    }
+
+    .input {
+      min-height: 74px;
+      padding: 1rem 1.15rem;
+      overflow: hidden;
+      border: 1px solid rgba(91, 180, 255, 0.3);
+      border-radius: 15px;
+      background: rgba(1, 7, 16, 0.85);
+      color: #d9ebff;
+      font: 600 clamp(13px, 1.15vw, 21px) ui-monospace, SFMono-Regular, Menlo, monospace;
+      line-height: 1.45;
+      word-break: break-all;
+    }
+
+    .typed {
+      display: inline;
+      border-right: 2px solid var(--cyan);
+      animation: caret 700ms steps(1) infinite;
+    }
+
+    @keyframes caret { 50% { border-color: transparent; } }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .chip {
+      padding: 0.8rem 1rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.035);
+      color: #cbd9eb;
+      font-size: clamp(13px, 1.1vw, 20px);
+    }
+
+    .button {
+      width: 100%;
+      margin-top: 1.25rem;
+      padding: 1rem;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      box-shadow: 0 10px 36px rgba(55, 174, 255, 0.28);
+      color: #03101e;
+      font-size: clamp(15px, 1.25vw, 23px);
+      font-weight: 850;
+    }
+
+    .scan-line {
+      position: absolute;
+      right: 4%;
+      left: 4%;
+      height: 3px;
+      top: 18%;
+      opacity: 0;
+      background: linear-gradient(90deg, transparent, var(--cyan), white, var(--cyan), transparent);
+      box-shadow: 0 0 24px var(--cyan);
+    }
+
+    .scene.active .scan-line {
+      opacity: 1;
+      animation: scan 2.4s ease-in-out 3;
+    }
+
+    @keyframes scan {
+      0% { top: 18%; opacity: 0; }
+      15% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { top: 84%; opacity: 0; }
+    }
+
+    .report {
+      display: grid;
+      grid-template-columns: 0.86fr 1.4fr;
+      gap: 4%;
+      align-items: stretch;
+    }
+
+    .verdict-card, .findings {
+      padding: 5%;
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: var(--panel);
+      box-shadow: 0 24px 80px rgba(0, 30, 75, 0.36);
+    }
+
+    .risk {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 1.2rem 0 1.5rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(255,184,77,0.42);
+      border-radius: 999px;
+      background: rgba(255,184,77,0.1);
+      color: #ffd28a;
+      font-size: clamp(20px, 2.1vw, 37px);
+      font-weight: 850;
+    }
+
+    .confidence {
+      color: var(--muted);
+      font-size: clamp(17px, 1.45vw, 26px);
+    }
+
+    .finding {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 0.9rem;
+      align-items: start;
+      margin-bottom: 0.75rem;
+      padding: 0.78rem 0.9rem;
+      opacity: 0;
+      transform: translateX(28px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 13px;
+      background: rgba(255,255,255,0.025);
+      color: #dce8f8;
+      font-size: clamp(15px, 1.3vw, 23px);
+      line-height: 1.35;
+    }
+
+    .scene.active .finding {
+      animation: reveal 560ms ease forwards;
+    }
+
+    .scene.active .finding:nth-child(2) { animation-delay: 1.6s; }
+    .scene.active .finding:nth-child(3) { animation-delay: 3.6s; }
+    .scene.active .finding:nth-child(4) { animation-delay: 5.6s; }
+    .scene.active .finding:nth-child(5) { animation-delay: 7.8s; }
+    .scene.active .finding:nth-child(6) { animation-delay: 10s; }
+
+    @keyframes reveal {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .ok { color: var(--green); font-weight: 900; }
+    .warn { color: var(--amber); font-weight: 900; }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 130px 1fr;
+      gap: 2rem;
+      align-items: stretch;
+    }
+
+    .compare-card {
+      display: grid;
+      place-items: center;
+      min-height: 330px;
+      padding: 2rem;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--panel);
+      text-align: center;
+    }
+
+    .compare-card.emphasis {
+      border-color: rgba(255,184,77,0.44);
+      box-shadow: 0 0 55px rgba(255, 154, 36, 0.15);
+    }
+
+    .compare-card strong {
+      display: block;
+      margin: 0.6rem 0;
+      font-size: clamp(44px, 5.2vw, 90px);
+      line-height: 1;
+    }
+
+    .arrow {
+      display: grid;
+      place-items: center;
+      color: var(--cyan);
+      font-size: 72px;
+    }
+
+    .why {
+      color: var(--amber);
+      font-size: clamp(17px, 1.6vw, 29px);
+      font-weight: 800;
+    }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .source {
+      padding: 1.2rem 1.35rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+      font-size: clamp(15px, 1.35vw, 24px);
+    }
+
+    .source b {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: var(--cyan);
+    }
+
+    .closing {
+      text-align: center;
+      place-items: center;
+    }
+
+    .closing h1 { margin-inline: auto; }
+    .closing .lead { margin-inline: auto; }
+
+    .agent {
+      display: inline-block;
+      margin-top: 1.1rem;
+      padding: 0.8rem 1.1rem;
+      border: 1px solid rgba(55,213,255,0.3);
+      border-radius: 999px;
+      background: rgba(55,213,255,0.08);
+      color: var(--cyan);
+      font-size: clamp(18px, 1.7vw, 31px);
+      font-weight: 800;
+    }
+
+    #controls {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(rgba(1,4,10,0.68), rgba(1,4,10,0.88)),
+        url("../assets/token-risk-brief-cover-1280x720.png") center / cover no-repeat;
+      transition: opacity 450ms ease;
+    }
+
+    #controls.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .start-card {
+      width: min(620px, 72%);
+      padding: 2.5rem;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(3, 10, 23, 0.92);
+      box-shadow: 0 30px 100px rgba(0,0,0,0.45);
+      text-align: center;
+      backdrop-filter: blur(18px);
+    }
+
+    .start-card h2 { margin-bottom: 0.7rem; }
+    .start-card p { color: var(--muted); font-size: 19px; line-height: 1.5; }
+
+    #start {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 1rem 1.2rem;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      color: #02101d;
+      font-size: 21px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    #progress {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 30;
+      height: 5px;
+      transform: scaleX(0);
+      transform-origin: left;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--amber));
+      box-shadow: 0 0 18px rgba(55,213,255,0.7);
+    }
+
+    #timer {
+      position: absolute;
+      top: 2.5%;
+      right: 2.5%;
+      z-index: 30;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 9px;
+      background: rgba(0,5,14,0.58);
+      color: var(--muted);
+      font: 650 clamp(12px, 1vw, 18px) ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    @media (max-aspect-ratio: 4/3) {
+      .caption { bottom: 3%; }
+      .finding { margin-bottom: 0.55rem; padding-block: 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <main id="stage" aria-label="Token Risk Brief 57-second product demo">
+    <section class="scene cover active" data-duration="6000">
+      <div class="caption">Raw token scanners return flags. Investors and AI agents still have to interpret them.</div>
+    </section>
+
+    <section class="scene" data-duration="8500">
+      <div class="input-layout">
+        <div>
+          <div class="eyebrow">One input · One decision-ready brief</div>
+          <h2>Is this token actually low risk?</h2>
+          <p class="lead">Paste a contract address and chain. Token Risk Brief interprets the evidence.</p>
+        </div>
+        <div class="app-card">
+          <div class="scan-line"></div>
+          <div class="label">Token contract</div>
+          <div class="input"><span class="typed" id="contract"></span></div>
+          <div class="meta-row">
+            <div class="chip">Token: Uniswap (UNI)</div>
+            <div class="chip">Chain: Ethereum</div>
+          </div>
+          <div class="button">Analyze risk</div>
+        </div>
+      </div>
+      <div class="caption">Token Risk Brief turns scattered security and market signals into one source-linked verdict.</div>
+    </section>
+
+    <section class="scene" data-duration="17000">
+      <div class="report">
+        <div class="verdict-card">
+          <div class="eyebrow">Token Risk Brief</div>
+          <h2>Uniswap (UNI)</h2>
+          <div class="risk">⚠ Risk: MEDIUM</div>
+          <div class="confidence">Confidence: MEDIUM</div>
+        </div>
+        <div class="findings">
+          <div class="eyebrow">Top findings</div>
+          <div class="finding"><span class="ok">✓</span><span>No honeypot detected</span></div>
+          <div class="finding"><span class="ok">✓</span><span>Buy tax: 0% · Sell tax: 0%</span></div>
+          <div class="finding"><span class="ok">✓</span><span>Liquidity: approximately $125.25M</span></div>
+          <div class="finding"><span class="warn">!</span><span>Top 10 holders: 38.18%</span></div>
+          <div class="finding"><span class="warn">!</span><span>Minting capability enabled</span></div>
+        </div>
+      </div>
+      <div class="caption">Sellability and liquidity pass. Concentration and minting control prevent an unconditional low-risk verdict.</div>
+    </section>
+
+    <section class="scene" data-duration="10500">
+      <div>
+        <div class="eyebrow">The interpretation layer</div>
+        <div class="compare-grid">
+          <div class="compare-card">
+            <div>
+              <div class="label">Underlying scanner</div>
+              <strong style="color: var(--green)">LOW</strong>
+              <div class="confidence">Raw security score</div>
+            </div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="compare-card emphasis">
+            <div>
+              <div class="label">Token Risk Brief</div>
+              <strong style="color: var(--amber)">MEDIUM</strong>
+              <div class="why">Explains why</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="caption">The scanner says LOW. Token Risk Brief says MEDIUM—and explains the concentration and control signals behind the decision.</div>
+    </section>
+
+    <section class="scene" data-duration="8000">
+      <div>
+        <div class="eyebrow">Auditable by design</div>
+        <h2>Evidence, confidence and gaps—together.</h2>
+        <div class="source-grid">
+          <div class="source"><b>Timestamped evidence</b>As of 2026-07-16 06:07 UTC</div>
+          <div class="source"><b>Source-linked</b>OKX Onchain OS token report</div>
+          <div class="source"><b>Transparent confidence</b>Confidence: Medium</div>
+          <div class="source"><b>Research only</b>Not financial advice</div>
+        </div>
+      </div>
+      <div class="caption">Every brief includes confidence, evidence gaps, timestamped sources and a decision-ready explanation.</div>
+    </section>
+
+    <section class="scene closing" data-duration="7000">
+      <div>
+        <div class="eyebrow">Built for OKX.AI</div>
+        <h1>Token Risk Brief</h1>
+        <p class="lead">Evidence. Confidence. Verdict.</p>
+        <div class="agent">Agent #6064 · 0.1 USDT</div>
+      </div>
+      <div class="caption">Token Risk Brief, Agent 6064 on OKX.AI.</div>
+    </section>
+
+    <div id="controls">
+      <div class="start-card">
+        <div class="eyebrow">57-second demo</div>
+        <h2>Token Risk Brief</h2>
+        <p>Start the screen recording first, then click below. The presentation plays automatically and enters full screen.</p>
+        <button id="start" type="button">Start demo</button>
+      </div>
+    </div>
+    <div id="timer">00:57</div>
+    <div id="progress"></div>
+  </main>
+
+  <script>
+    const scenes = [...document.querySelectorAll(".scene")];
+    const controls = document.querySelector("#controls");
+    const startButton = document.querySelector("#start");
+    const progress = document.querySelector("#progress");
+    const timer = document.querySelector("#timer");
+    const contractNode = document.querySelector("#contract");
+    const contract = "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984";
+    const totalDuration = scenes.reduce((sum, scene) => sum + Number(scene.dataset.duration), 0);
+
+    let timers = [];
+    let startedAt = 0;
+    let frame = 0;
+
+    function clearPlayback() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      cancelAnimationFrame(frame);
+      scenes.forEach((scene, index) => {
+        scene.classList.toggle("active", index === 0);
+        scene.classList.remove("leaving");
+      });
+      contractNode.textContent = "";
+    }
+
+    function typeContract() {
+      contractNode.textContent = "";
+      contract.split("").forEach((character, index) => {
+        timers.push(setTimeout(() => {
+          contractNode.textContent += character;
+        }, 55 * index));
+      });
+    }
+
+    function showScene(index) {
+      scenes.forEach((scene, sceneIndex) => {
+        scene.classList.toggle("active", sceneIndex === index);
+        scene.classList.toggle("leaving", sceneIndex === index - 1);
+      });
+      if (index === 1) typeContract();
+    }
+
+    function updateProgress() {
+      const elapsed = Math.min(Date.now() - startedAt, totalDuration);
+      progress.style.transform = `scaleX(${elapsed / totalDuration})`;
+      const remaining = Math.max(0, Math.ceil((totalDuration - elapsed) / 1000));
+      timer.textContent = `00:${String(remaining).padStart(2, "0")}`;
+      if (elapsed < totalDuration) {
+        frame = requestAnimationFrame(updateProgress);
+      }
+    }
+
+    async function play() {
+      clearPlayback();
+      controls.classList.add("hidden");
+      progress.style.transform = "scaleX(0)";
+
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch {
+        // Playback still works when fullscreen permission is unavailable.
+      }
+
+      startedAt = Date.now();
+      updateProgress();
+
+      let offset = 0;
+      scenes.forEach((scene, index) => {
+        timers.push(setTimeout(() => showScene(index), offset));
+        offset += Number(scene.dataset.duration);
+      });
+
+      timers.push(setTimeout(() => {
+        controls.querySelector(".start-card h2").textContent = "Demo complete";
+        startButton.textContent = "Replay demo";
+        controls.classList.remove("hidden");
+      }, totalDuration + 800));
+    }
+
+    startButton.addEventListener("click", play);
+  </script>
+</body>
+</html>
