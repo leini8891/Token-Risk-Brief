@@ -121,6 +121,21 @@ Reconsider a minimal read-only MCP/HTTP service only when all of the following a
 
 If implemented later, the minimum surface should expose one read-only analysis operation. It must not accept wallet credentials, sign transactions, call state-changing contracts, or offer trading tools.
 
+### 6.5 Local deterministic engine
+
+The repository includes a local evidence-to-verdict engine. It accepts normalized evidence only after the research workflow has verified the exact contract and chain and collected attributable, timestamped sources.
+
+The engine:
+
+- calculates core-area coverage;
+- preserves explicit unknown checks;
+- returns `Low`, `Medium`, or `High` risk and independent confidence;
+- maps the result to `NO_CRITICAL_SIGNAL`, `REVIEW`, or `BLOCK`;
+- renders a source-linked Markdown brief; and
+- fails closed when identity or required input structure is invalid.
+
+The engine is not a live scanner, data collector, hosted service, or public endpoint. It never converts missing evidence into a reassuring verdict. The JSON input contract is defined in [`schema/evidence.schema.json`](schema/evidence.schema.json), and the three required decision paths are covered by fixtures and automated tests.
+
 ## 7. Input contract
 
 The following is a logical task contract, not an HTTP schema.
@@ -327,6 +342,7 @@ A release is complete when:
 - the public README, PRD, UNI sample, static demo, and submission copy describe the same Agent, mode, inputs, verdict, and differentiating findings;
 - Agent #6064 and the `0.1 USDT` submitted default price are consistent wherever shown;
 - the A2A flow is described without claiming that an endpoint is required;
+- the local engine reproduces the UNI verdict, blocks a verified sell blocker, and lowers confidence when core evidence is missing;
 - no production website or API is implied by the static demo;
 - the risk, confidence, evidence, failure, and disclaimer rules are explicit;
 - no trading, wallet, signing, or private-key capability is present;

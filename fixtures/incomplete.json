@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "asset": {
+    "name": "Synthetic Incomplete Evidence Fixture",
+    "symbol": "TEST-GAP",
+    "contract_address": "0x2222222222222222222222222222222222222222",
+    "chain": "Ethereum",
+    "identity_verified": true,
+    "fixture": true
+  },
+  "as_of": "2026-07-18T00:00:00Z",
+  "sources": [
+    {
+      "id": "synthetic-partial-source",
+      "name": "Synthetic partial test evidence",
+      "retrieved_at": "2026-07-18T00:00:00Z"
+    }
+  ],
+  "areas": {
+    "contract_control": {
+      "status": "available",
+      "findings": [
+        {
+          "id": "source_code_reviewed",
+          "summary": "The available synthetic control evidence contained no verified critical condition.",
+          "severity": "pass",
+          "verified": true,
+          "source_ids": [
+            "synthetic-partial-source"
+          ]
+        }
+      ],
+      "unknown_checks": []
+    },
+    "sellability": {
+      "status": "available",
+      "findings": [
+        {
+          "id": "basic_transfer_check",
+          "summary": "A basic transfer check passed, but broader market evidence was unavailable.",
+          "severity": "pass",
+          "verified": true,
+          "source_ids": [
+            "synthetic-partial-source"
+          ]
+        }
+      ],
+      "unknown_checks": []
+    },
+    "liquidity": {
+      "status": "not_available",
+      "reason": "No attributable liquidity or amount-aware price-impact evidence was available.",
+      "unknown_checks": [
+        "liquidity.depth",
+        "liquidity.price_impact"
+      ]
+    },
+    "holder_concentration": {
+      "status": "not_available",
+      "reason": "No attributable holder distribution or address classification was available.",
+      "unknown_checks": [
+        "holder_concentration.top_holders",
+        "holder_concentration.address_attribution"
+      ]
+    }
+  },
+  "limitations": [
+    {
+      "type": "single_source_dependency",
+      "summary": "Only one partial synthetic source was available."
+    }
+  ]
+}

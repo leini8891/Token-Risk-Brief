@@ -8,7 +8,7 @@ Token Risk Brief turns scattered token-security and market signals into a concis
 
 Token Risk Brief is **Agent #6064** on OKX.AI. Its current service, **Token Contract Risk Analysis**, is configured for agent-to-agent negotiated delivery with a submitted default price of **0.1 USDT**.
 
-> This public repository contains the product requirements, a representative UNI report, and a static browser demo. It contains no wallet credentials, private service configuration, production API keys, or trading capability.
+> This public repository contains the product requirements, a deterministic evidence-to-verdict engine, test fixtures, a representative UNI report, and a static browser demo. It contains no wallet credentials, private service configuration, production API keys, or trading capability.
 
 ## Why it exists
 
@@ -23,14 +23,14 @@ flowchart LR
     A["Requester or agent"] --> B["OKX.AI negotiated task"]
     B --> C["Validate contract and chain"]
     C --> D["Collect read-only evidence"]
-    D --> E["Apply risk and confidence rules"]
+    D --> E["Run deterministic risk engine"]
     E --> F["Deliver source-linked Markdown brief"]
     F --> B
     G["OKX Onchain OS token data"] --> D
     H["Authoritative explorer and project sources"] --> D
 ```
 
-The OKX.AI task flow handles negotiation, escrow, delivery, acceptance, and disputes. Token Risk Brief handles research and report quality only.
+The OKX.AI task flow handles negotiation, escrow, delivery, acceptance, and disputes. Token Risk Brief handles research and report quality only. Its local engine turns already-collected, normalized evidence into a deterministic verdict; it does not fetch live data or bypass the task flow.
 
 ### Why there is no standalone endpoint
 
@@ -92,6 +92,66 @@ Confidence is `High` only when the exact asset is verified and all four core are
 
 A clean scanner result is not enough for a low-risk verdict.
 
+## Run the risk engine
+
+The local engine accepts normalized, attributable evidence and returns:
+
+- `risk`: `Low`, `Medium`, or `High`;
+- `decision`: `NO_CRITICAL_SIGNAL`, `REVIEW`, or `BLOCK`;
+- an independent confidence rating;
+- core-area coverage;
+- explicit unknown checks;
+- evidence-linked findings and rationale; and
+- a delivery-ready Markdown report when requested.
+
+It deliberately does **not** scrape scanners, call live APIs, or invent unavailable evidence. Evidence collection remains a read-only research step; the engine makes the decision rules reproducible once that evidence has been normalized.
+
+Requirements: Node.js 20 or newer. No package installation or API key is required.
+
+```bash
+npm run analyze -- fixtures/uni.json
+```
+
+The verified UNI fixture currently returns this excerpt:
+
+```json
+{
+  "risk": "Medium",
+  "decision": "REVIEW",
+  "confidence": "Medium",
+  "coverage": {
+    "available_core_areas": 4,
+    "total_core_areas": 4,
+    "percentage": 100
+  },
+  "unknown_checks": [
+    "holder_concentration.address_attribution"
+  ]
+}
+```
+
+Generate the delivery-ready report:
+
+```bash
+npm run analyze -- fixtures/uni.json --format markdown
+```
+
+Run the automated checks:
+
+```bash
+npm test
+```
+
+The test suite covers three decision paths:
+
+| Fixture | Expected result | Purpose |
+|---|---|---|
+| `fixtures/uni.json` | `Medium / REVIEW / Medium confidence` | Reproduces the documented UNI conclusion |
+| `fixtures/honeypot.json` | `High / BLOCK / High confidence` | Proves that a verified sell blocker dominates otherwise clean evidence |
+| `fixtures/incomplete.json` | `Medium / REVIEW / Low confidence` | Proves that missing liquidity and holder evidence cannot become a reassuring low-risk result |
+
+The honeypot and incomplete-data fixtures are explicitly synthetic. They test the rules and must not be presented as reports about real tokens. The normalized input contract is documented as JSON Schema in [`schema/evidence.schema.json`](schema/evidence.schema.json).
+
 ## UNI example
 
 The included [UNI sample](DEMO_SAMPLE.md) analyzes the Ethereum contract:
@@ -132,6 +192,11 @@ For screen-recording instructions, see the [demo guide](demo/README.md).
 
 - [`PRD_TOKEN_RISK_BRIEF.md`](PRD_TOKEN_RISK_BRIEF.md) — current product requirements and decision rules
 - [`DEMO_SAMPLE.md`](DEMO_SAMPLE.md) — representative UNI risk brief
+- [`src/engine.js`](src/engine.js) — deterministic evidence-to-verdict engine and Markdown renderer
+- [`src/cli.js`](src/cli.js) — local command-line entry point
+- [`schema/evidence.schema.json`](schema/evidence.schema.json) — normalized evidence contract
+- [`fixtures/`](fixtures) — UNI and synthetic edge-case evidence
+- [`test/engine.test.js`](test/engine.test.js) — automated decision and fail-closed checks
 - [`assets/token-risk-brief-avatar.png`](assets/token-risk-brief-avatar.png) — Agent avatar
 - [`assets/token-risk-brief-cover-1280x720.png`](assets/token-risk-brief-cover-1280x720.png) — project cover
 - [`demo/index.html`](demo/index.html) — self-contained product demo

@@ -1,0 +1,115 @@
+{
+  "schema_version": "1.0",
+  "asset": {
+    "name": "Uniswap",
+    "symbol": "UNI",
+    "contract_address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+    "chain": "Ethereum",
+    "identity_verified": true,
+    "fixture": false
+  },
+  "as_of": "2026-07-16T06:07:30Z",
+  "sources": [
+    {
+      "id": "okx-token-report",
+      "name": "OKX Onchain OS token report",
+      "retrieved_at": "2026-07-16T06:07:30Z"
+    },
+    {
+      "id": "okx-explorer",
+      "name": "OKX Ethereum explorer",
+      "url": "https://web3.okx.com/explorer/ethereum/token/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+      "retrieved_at": "2026-07-16T06:07:30Z"
+    }
+  ],
+  "areas": {
+    "contract_control": {
+      "status": "available",
+      "findings": [
+        {
+          "id": "mintable",
+          "summary": "Minting capability was reported as enabled; this is a control signal, not proof of malicious issuance.",
+          "severity": "warning",
+          "verified": true,
+          "source_ids": [
+            "okx-token-report"
+          ]
+        },
+        {
+          "id": "open_source",
+          "summary": "The token contract was reported as open source.",
+          "severity": "pass",
+          "verified": true,
+          "source_ids": [
+            "okx-token-report",
+            "okx-explorer"
+          ]
+        }
+      ],
+      "unknown_checks": []
+    },
+    "sellability": {
+      "status": "available",
+      "findings": [
+        {
+          "id": "honeypot",
+          "summary": "No honeypot signal was reported.",
+          "severity": "pass",
+          "verified": true,
+          "source_ids": [
+            "okx-token-report"
+          ]
+        },
+        {
+          "id": "transfer_tax",
+          "summary": "Buy and sell taxes were reported as 0%.",
+          "severity": "pass",
+          "verified": true,
+          "source_ids": [
+            "okx-token-report"
+          ]
+        }
+      ],
+      "unknown_checks": []
+    },
+    "liquidity": {
+      "status": "available",
+      "findings": [
+        {
+          "id": "reported_liquidity",
+          "summary": "Reported liquidity was approximately $125.25M.",
+          "severity": "pass",
+          "verified": true,
+          "source_ids": [
+            "okx-token-report"
+          ]
+        }
+      ],
+      "unknown_checks": []
+    },
+    "holder_concentration": {
+      "status": "available",
+      "findings": [
+        {
+          "id": "top_10_concentration",
+          "summary": "The top 10 addresses held 38.18% of supply without address-level attribution in the snapshot.",
+          "severity": "warning",
+          "verified": true,
+          "source_ids": [
+            "okx-token-report"
+          ]
+        }
+      ],
+      "unknown_checks": [
+        "holder_concentration.address_attribution"
+      ]
+    }
+  },
+  "limitations": [
+    {
+      "type": "attribution_gap",
+      "area": "holder_concentration",
+      "summary": "The snapshot did not classify the top holder addresses."
+    }
+  ]
+}

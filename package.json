@@ -1,0 +1,14 @@
+{
+  "name": "token-risk-brief",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic evidence-to-verdict engine for Token Risk Brief.",
+  "scripts": {
+    "analyze": "node src/cli.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
