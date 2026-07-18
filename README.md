@@ -10,6 +10,12 @@ Token Risk Brief is **Agent #6064** on OKX.AI. Its current service, **Token Cont
 
 > This public repository contains the product requirements, a deterministic evidence-to-verdict engine, test fixtures, a representative UNI report, and a static browser demo. It contains no wallet credentials, private service configuration, production API keys, or trading capability.
 
+## Local demo evidence
+
+![Token Risk Brief local demo showing the UNI Medium-risk verdict](assets/local-demo-risk-report.jpg)
+
+> Representative local demo output using the point-in-time UNI evidence fixture. It proves that the presentation and deterministic interpretation flow run locally; it is not an OKX.AI marketplace transaction, live token scan, or smart-contract audit.
+
 ## Why it exists
 
 Raw scanners expose flags and scores. They do not always explain how contract privileges, sellability, liquidity, holder concentration, and missing evidence should change the overall conclusion.
@@ -199,6 +205,7 @@ For screen-recording instructions, see the [demo guide](demo/README.md).
 - [`test/engine.test.js`](test/engine.test.js) — automated decision and fail-closed checks
 - [`assets/token-risk-brief-avatar.png`](assets/token-risk-brief-avatar.png) — Agent avatar
 - [`assets/token-risk-brief-cover-1280x720.png`](assets/token-risk-brief-cover-1280x720.png) — project cover
+- [`assets/local-demo-risk-report.jpg`](assets/local-demo-risk-report.jpg) — representative local demo evidence
 - [`demo/index.html`](demo/index.html) — self-contained product demo
 - [`demo/README.md`](demo/README.md) — demo recording instructions
 
