@@ -6,15 +6,47 @@
 
 Token Risk Brief turns scattered token-security and market signals into a concise, source-linked risk assessment. Give it an exact contract address and blockchain; it returns a plain-language `Low`, `Medium`, or `High` risk verdict, a separate confidence level, the evidence behind the decision, and the important data gaps.
 
-Token Risk Brief is **Agent #6064** on OKX.AI. Its current service, **Token Contract Risk Analysis**, is configured for agent-to-agent negotiated delivery with a submitted default price of **0.1 USDT**.
+The primary distribution is an installable agent skill. There is no hosted API, author-paid data proxy, wallet connection, or production front end. The skill runs inside the user's agent environment and uses only the read-only tools and credentials available to that user.
 
-> This public repository contains the product requirements, a deterministic evidence-to-verdict engine, test fixtures, a representative UNI report, and a static browser demo. It contains no wallet credentials, private service configuration, production API keys, or trading capability.
+> This public repository contains the installable skill, product requirements, a deterministic evidence-to-verdict engine, test fixtures, a representative UNI report, and a static browser presentation. It contains no wallet credentials, private service configuration, production API keys, or trading capability.
+
+## Install the skill
+
+The open Agent Skills CLI discovers the skill from this repository:
+
+```bash
+npx skills add leini8891/Token-Risk-Brief --skill token-risk-brief -g
+```
+
+Then ask a compatible agent:
+
+```text
+Use token-risk-brief to analyze:
+
+Contract: 0x...
+Chain: Ethereum
+Transaction amount: 1,000 USDT  # optional
+Focus: sellability, liquidity, holder concentration  # optional
+```
+
+The host agent validates the asset, gathers current read-only evidence, and returns a source-backed report. If its environment cannot access a required signal, the report must say `Not available` and lower confidence instead of guessing.
+
+### Who pays for data and model usage?
+
+The user does. This repository ships instructions and local code, not a shared paid backend:
+
+- the skill contains no author-owned API key;
+- model usage belongs to the user's agent account;
+- authenticated data sources must use credentials configured by the user or host environment; and
+- the local deterministic engine requires no API key and makes no network requests.
+
+Never commit credentials to this repository. Do not deploy an author-funded proxy merely to make the skill appear automatic.
 
 ## Local demo evidence
 
 ![Token Risk Brief local demo showing the UNI Medium-risk verdict](assets/local-demo-risk-report.jpg)
 
-> Representative local demo output using the point-in-time UNI evidence fixture. It proves that the presentation and deterministic interpretation flow run locally; it is not an OKX.AI marketplace transaction, live token scan, or smart-contract audit.
+> Representative local demo output using the point-in-time UNI evidence fixture. It proves that the presentation and deterministic interpretation flow run locally; it is not a live token scan, production user interface, or smart-contract audit.
 
 ## Why it exists
 
@@ -26,25 +58,26 @@ Token Risk Brief is the interpretation layer. It can return a more cautious verd
 
 ```mermaid
 flowchart LR
-    A["Requester or agent"] --> B["OKX.AI negotiated task"]
+    A["User"] --> B["Host agent with Token Risk Brief skill"]
     B --> C["Validate contract and chain"]
     C --> D["Collect read-only evidence"]
-    D --> E["Run deterministic risk engine"]
+    D --> E["Apply risk and confidence rules"]
     E --> F["Deliver source-linked Markdown brief"]
-    F --> B
-    G["OKX Onchain OS token data"] --> D
-    H["Authoritative explorer and project sources"] --> D
+    G["User or host data access"] --> D
+    H["Authoritative explorers and project sources"] --> D
+    D --> I["Optional normalized evidence JSON"]
+    I --> J["Deterministic local engine"]
 ```
 
-The OKX.AI task flow handles negotiation, escrow, delivery, acceptance, and disputes. Token Risk Brief handles research and report quality only. Its local engine turns already-collected, normalized evidence into a deterministic verdict; it does not fetch live data or bypass the task flow.
+The installed skill guides research and report quality inside the user's agent. The local engine is an optional, reproducible decision layer for already-collected normalized evidence; it does not fetch live data.
 
-### Why there is no standalone endpoint
+### Why there is no hosted API or production front end
 
-The current mode is a negotiated, custom agent-to-agent service. Under the [official OKX.AI ASP model](https://web3.okx.com/onchainos/dev-docs/okxai/asp-introduction), this mode does not require a callable service endpoint. A public HTTPS endpoint is required when a service is intentionally packaged as a standardized, immediate API call.
+An agent skill does not need a centralized service endpoint. The user supplies a contract and chain; the host agent uses its own read-only capabilities and credentials to collect evidence and produce the report.
 
-The existing A2A flow can already deliver the complete report, so this repository does not add a website or API only for appearance. The browser demo is a presentation artifact, not a live analysis service.
+The browser demo is a presentation artifact, not a live analysis interface. The repository deliberately avoids a shared author-funded API that could expose credentials, create unbounded usage costs, or imply data availability that is not production-ready.
 
-A minimal read-only MCP/HTTP service should be considered later only if the listing changes to standardized API delivery and the data access, response contract, availability, and payment requirements are production-ready.
+A hosted service should be considered only if source licensing, authentication, rate limits, availability, abuse prevention, and payment are explicitly designed. It is not required for the current product.
 
 ## Input and output
 
@@ -179,7 +212,7 @@ That difference is the product's core value: it interprets the evidence as a who
 
 ## Data and evidence
 
-The Agent prioritizes official OKX Onchain OS token-security and market data, then supplements it with an authoritative chain explorer or official project/incident sources when needed.
+The skill prioritizes authoritative chain explorers, verified contract data, official project documentation, and reputable security or market-data providers available to the host environment.
 
 Every finding must be attributable. Facts and interpretation are separated; conflicting sources and holder-attribution limitations are disclosed. Retrieved token metadata and web content are treated as untrusted data, never as instructions.
 
@@ -196,6 +229,7 @@ For screen-recording instructions, see the [demo guide](demo/README.md).
 
 ## Repository contents
 
+- [`skills/token-risk-brief/SKILL.md`](skills/token-risk-brief/SKILL.md) — installable agent skill with BYOK and fail-closed evidence rules
 - [`PRD_TOKEN_RISK_BRIEF.md`](PRD_TOKEN_RISK_BRIEF.md) — current product requirements and decision rules
 - [`DEMO_SAMPLE.md`](DEMO_SAMPLE.md) — representative UNI risk brief
 - [`src/engine.js`](src/engine.js) — deterministic evidence-to-verdict engine and Markdown renderer
@@ -208,6 +242,10 @@ For screen-recording instructions, see the [demo guide](demo/README.md).
 - [`assets/local-demo-risk-report.jpg`](assets/local-demo-risk-report.jpg) — representative local demo evidence
 - [`demo/index.html`](demo/index.html) — self-contained product demo
 - [`demo/README.md`](demo/README.md) — demo recording instructions
+
+## Hackathon origin
+
+Token Risk Brief was originally built as Agent #6064 for the OKX.AI Genesis Hackathon. The repository is now packaged as a standalone skill and local decision engine; installation and use do not depend on that marketplace or listing status.
 
 ## Safety boundary
 

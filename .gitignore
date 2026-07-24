@@ -1,5 +1,8 @@
 .DS_Store
 
+# Local demo recordings
+demo/*.mov
+
 # Private or obsolete project material
 PLAN.md
 ARCHIVED_PROOFPACK_PLAN.md
