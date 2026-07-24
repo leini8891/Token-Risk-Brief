@@ -46,6 +46,8 @@ Never commit credentials to this repository. Do not deploy an author-funded prox
 
 ![Token Risk Brief local demo showing the UNI Medium-risk verdict](assets/local-demo-risk-report.jpg)
 
+[▶ Watch the 1-minute UNI walkthrough on X](https://x.com/ElenaX_data/status/2077685705946607951)
+
 > Representative local demo output using the point-in-time UNI evidence fixture. It proves that the presentation and deterministic interpretation flow run locally; it is not a live token scan, production user interface, or smart-contract audit.
 
 ## Why it exists
